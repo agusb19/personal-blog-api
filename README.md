@@ -43,9 +43,9 @@ The API relies on headers, sending the signed token within the response body and
 | Endpoint | Queries | Description | 
 | ------ | ------ | ------ |
 | **GET ***`/article`***** | **token** | Get all articles from user |
-| **PATCH ***`/article/data`***** | id, name, title, image, keywords, description **token** | Change article data info |
+| **PATCH ***`/article/data`***** | id, name, title, keywords, image_name, description **token** | Change article data info |
 | **PATCH ***`/article/publishment`***** | id, is_publish, **token** | Change article publish state |
-| **POST ***`/article`***** | name, title, image, keywords, description, **token** |  Add new article |
+| **POST ***`/article`***** | name, title, keywords, image_name, description, **token** |  Add new article |
 | **DELETE ***`/article`***** | id, **token** |  Remove article |
 
 ## Section Routes
