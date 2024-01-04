@@ -3,6 +3,8 @@ import { bucketConfig, ENVIRONMENT } from '../utils/config'
 
 const currentBucketConfig = bucketConfig[ENVIRONMENT]
 
+export const bucketName = currentBucketConfig.bucketName
+
 export const s3 = new S3Client({
     region: currentBucketConfig.bucketRegion ?? '',
     credentials: {
