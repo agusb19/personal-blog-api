@@ -26,17 +26,17 @@ const sectionTableSchema = z.object({
         required_error: 'Content section type is required',
         invalid_type_error: 'Content section type must be a string'
     }),
-    image_url: z.string({
-        required_error: 'Content image url is required',
-        invalid_type_error: 'Content image url must be a string'
+    image_name: z.string({
+        required_error: 'Content image name is required',
+        invalid_type_error: 'Content image name must be a string or null type'
     }).nullable()
 })
 
 const id = sectionTableSchema.pick({ id: true })
 const articleId = sectionTableSchema.pick({ article_id: true })
 const articleIdQuery = sectionTableSchema.pick({ article_id_query: true })
-const idContent = sectionTableSchema.pick({ id: true, content: true, content_type: true, image_url: true })
-const articleIdContent = sectionTableSchema.pick({ article_id: true, content: true, content_type: true, image_url: true })
+const idContent = sectionTableSchema.pick({ id: true, content: true, content_type: true, image_name: true })
+const articleIdContent = sectionTableSchema.pick({ article_id: true, content: true, content_type: true, image_name: true })
 
 const articleIdData = articleIdContent.merge(styleSchema.partialData)
 const idData = idContent.merge(styleSchema.partialData)
