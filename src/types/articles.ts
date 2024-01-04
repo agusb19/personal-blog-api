@@ -16,8 +16,8 @@ export interface IArticle {
     getAll({ user_id }: ArticleType['userId']): Promise<RowDataPacket[]>
     getId({ user_id, name }: ArticleType['userIdName']): Promise<RowDataPacket[]>
     changePublishState({ id, is_publish }: ArticleType['idPublishState']): Promise<RowDataPacket[]>
-    changeData({ id, name, title, image, keywords, description }: ArticleType['idData']): Promise<RowDataPacket[]>
-    addNew({ user_id, name, title, image, keywords, description }: ArticleType['userIdData']): Promise<RowDataPacket[]>
+    changeData({ id, name, title, keywords, image_name, description }: ArticleType['idData']): Promise<RowDataPacket[]>
+    addNew({ user_id, name, title, keywords, image_name, description }: ArticleType['userIdData']): Promise<RowDataPacket[]>
     remove({ id }: ArticleType['id']): Promise<RowDataPacket[]>
 }
 

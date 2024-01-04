@@ -34,12 +34,12 @@ class Article implements IArticle {
         return rows as RowDataPacket[]
     }
 
-    changeData = async ({ id, name, title, image, keywords, description }: ArticleType['idData']) => {
+    changeData = async ({ id, name, title, keywords, image_name, description }: ArticleType['idData']) => {
         const connection = await this.pool.getConnection()
         
         const [rows] = await connection.execute(
             articleQueries[ArticleQueries.changeData],
-            [name, title, image, keywords, description, id]
+            [name, title, keywords, image_name, description, id]
         )   
 
         connection.release()
@@ -58,12 +58,12 @@ class Article implements IArticle {
         return rows as RowDataPacket[]
     }
 
-    addNew = async ({ user_id, name, title, image, keywords, description }: ArticleType['userIdData']) => {
+    addNew = async ({ user_id, name, title, keywords, image_name, description }: ArticleType['userIdData']) => {
         const connection = await this.pool.getConnection()
         
         const [rows] = await connection.execute(
             articleQueries[ArticleQueries.addNew],
-            [user_id, name, title, image, keywords, description]
+            [user_id, name, title, keywords, image_name, description]
         )
 
         connection.release()
