@@ -53,7 +53,7 @@ export class Sections implements SectionController {
     })
 
     changeAll = asyncErrorHandler(async (req: Request, res: Response) => {
-        // const { id, content, content_type, image_url, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
+        // const { id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
         const validation = this.validateSection.idData(req.body) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -73,7 +73,7 @@ export class Sections implements SectionController {
     })
 
     addNew = asyncErrorHandler(async (req: Request, res: Response) => {
-        // const { article_id, content, content_type, image_url, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
+        // const { article_id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
         const validation = this.validateSection.articleIdData(req.body)
 
         if(!validation.success) return this.validationErr(res, validation.error)
