@@ -151,6 +151,17 @@ export class Sections implements SectionController {
 
         if(!validation.success) return this.validationErr(res, validation.error)
 
+        const sectionData = await this.sectionModel.getData({ id: validation.data.id })
+
+        if(sectionData[0].image_name !== null) {
+            const command = new DeleteObjectCommand({
+                Bucket: bucketName,
+                Key: sectionData[0].image_name
+            })
+    
+            await s3.send(command)
+        }
+
         await this.sectionModel.remove(validation.data)
 
         return res.status(200).json(createOkResponse({
