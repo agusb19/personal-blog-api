@@ -4,7 +4,7 @@
 
 -- getData
     SELECT * FROM `articles`
-    WHERE `user_id` = ? AND `name` = ?
+    WHERE `user_id` = ? AND `name` = ?;
 
 -- addNew
     INSERT INTO `articles` (`user_id`, `name`, `title`, `keywords`, `image_name`, `description`)
