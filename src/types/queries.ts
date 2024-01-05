@@ -24,6 +24,7 @@ export enum ArticleQueries {
 
 export enum SectionQueries {
     getAll = 'getAll',
+    getData = 'getData',
     addNew = 'addNew',
     changeContent = 'changeContent',
     remove = 'remove'

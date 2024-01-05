@@ -15,6 +15,7 @@ export type SectionType = {
 
 export interface ISection {
     getAll({ article_id }: SectionType['articleId']): Promise<RowDataPacket[]>
+    getData({ id }: SectionType['id']): Promise<RowDataPacket[]>
     changeContent({ id, content, content_type, image_name }: SectionType['idContent']): Promise<RowDataPacket[]>
     addNew({ article_id, content, content_type, image_name }: SectionType['articleIdContent']): Promise<number>
     remove({ id }: SectionType['id']): Promise<RowDataPacket[]>

@@ -3,6 +3,10 @@
     INNER JOIN `styles` ON `sections`.`id` = `styles`.`section_id`
     WHERE `sections`.`article_id` = ?;
 
+-- getData
+    SELECT * FROM `sections`
+    WHERE `id` = ?;
+
 -- addNew
     INSERT INTO `sections` (`article_id`, `content`, `content_type`, `image_name`)
     VALUES (?, ?, ?, ?);
