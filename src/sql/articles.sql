@@ -15,7 +15,6 @@
     SET `name` = ?,
         `title` = ?,
         `keywords` = ?,
-        `image_name` = ?,
         `description` = ?
     WHERE `id` = ?;
 

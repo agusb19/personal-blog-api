@@ -50,7 +50,7 @@ export class Articles implements ArticleController {
     })
 
     changeData = asyncErrorHandler(async (req: Request, res: Response) => {
-        // const { id, name, title, keywords, image_name, description } = req.body
+        // const { id, name, title, keywords, description } = req.body
         const validation = this.validateArticle.idData(req.body)
 
         if(!validation.success) return this.validationErr(res, validation.error)
