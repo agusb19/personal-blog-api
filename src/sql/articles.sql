@@ -6,6 +6,10 @@
     SELECT * FROM `articles`
     WHERE `user_id` = ? AND `name` = ?;
 
+-- getDataById
+    SELECT * FROM `articles`
+    WHERE `id` = ?;
+
 -- addNew
     INSERT INTO `articles` (`user_id`, `name`, `title`, `keywords`, `image_name`, `description`)
     VALUES (?, ? ,?, ?, ?, ?);

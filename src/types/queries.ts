@@ -16,6 +16,7 @@ export enum UserQueries {
 export enum ArticleQueries {
     getAll = 'getAll',
     getData = 'getData',
+    getDataById = 'getDataById',
     addNew = 'addNew',
     changeData = 'changeData',
     changePublishment = 'changePublishment',

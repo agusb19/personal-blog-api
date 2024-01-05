@@ -15,6 +15,7 @@ export type ArticleType = {
 export interface IArticle {
     getAll({ user_id }: ArticleType['userId']): Promise<RowDataPacket[]>
     getData({ user_id, name }: ArticleType['userIdName']): Promise<RowDataPacket[]>
+    getDataById({ id }: ArticleType['id']): Promise<RowDataPacket[]>
     changePublishState({ id, is_publish }: ArticleType['idPublishState']): Promise<RowDataPacket[]>
     changeData({ id, name, title, keywords, description }: ArticleType['idData']): Promise<RowDataPacket[]>
     addNew({ user_id, name, title, keywords, image_name, description }: ArticleType['userIdData']): Promise<RowDataPacket[]>
