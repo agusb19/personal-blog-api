@@ -2,8 +2,8 @@
     SELECT * FROM `articles`
     WHERE `user_id` = ?;
 
--- getId
-    SELECT `id` FROM `articles`
+-- getData
+    SELECT * FROM `articles`
     WHERE `user_id` = ? AND `name` = ?
 
 -- addNew

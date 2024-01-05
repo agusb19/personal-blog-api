@@ -22,11 +22,11 @@ class Article implements IArticle {
         return rows as RowDataPacket[]
     }
 
-    getId = async ({ user_id, name }: ArticleType['userIdName']) => {
+    getData = async ({ user_id, name }: ArticleType['userIdName']) => {
         const connection = await this.pool.getConnection()
 
         const [rows] = await connection.execute(
-            articleQueries[ArticleQueries.getId],
+            articleQueries[ArticleQueries.getData],
             [user_id, name]
         )
 

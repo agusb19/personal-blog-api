@@ -81,7 +81,7 @@ export class Articles implements ArticleController {
 
         if(!validation.success) return this.validationErr(res, validation.error)
 
-        const result = await this.articleModel.getId(validation.data)
+        const result = await this.articleModel.getData(validation.data)
         
         if(result.length !== 0) return res.status(401).json(createErrorResponse({
             message: 'Existing article name'
