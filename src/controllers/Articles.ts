@@ -55,16 +55,15 @@ export class Articles implements ArticleController {
 
         if(!validation.success) return this.validationErr(res, validation.error)
         
-        if(!req.file) return res.status(400).json(createErrorResponse({ 
-            message: 'Validation data error, image file required' 
-        }))
+        if(req.file) {
+            const articleData = await this.articleModel.getData({
+                user_id: req.userId.id,
+                name: validation.data.name
+            })
+    
+            await this.uploadImage(articleData[0].image_name, req.file)
+        }
 
-        const articleData = await this.articleModel.getData({
-            user_id: req.userId.id,
-            name: validation.data.name
-        })
-
-        await this.uploadImage(articleData[0].image_name, req.file)
         await this.articleModel.changeData(validation.data)
 
         return res.status(200).json(createOkResponse({
