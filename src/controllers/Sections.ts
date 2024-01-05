@@ -32,35 +32,15 @@ export class Sections implements SectionController {
         }))
     }
 
-    private async uploadImage(res: Response, data: SectionType['articleIdData'], imageFile?: Express.Multer.File) {
-        
-        if(!imageFile) return res.status(400).json(createErrorResponse({ 
-            message: 'Validation data error, image file required' 
-        }))
-        
-        if(data.image_name === null) return res.status(400).json(createErrorResponse({ 
-            message: 'Validation data error, image name required' 
-        }))
-
+    private async uploadImage(imageName: string, imageFile: Express.Multer.File) {
         const command = new PutObjectCommand({
+            Key: imageName,
             Bucket: bucketName,
-            Key: data.image_name,
             Body: imageFile.buffer,
             ContentType: imageFile.mimetype
         })
 
         await s3.send(command)
-
-        const newIdSection = await this.sectionModel.addNew(data)
-
-        await this.styleModel.addNew({
-            ...data,
-            section_id: newIdSection
-        })
-
-        return res.status(201).json(createOkResponse({
-            message: 'New section image and styles created successfully'
-        }))
     }
 
     getAll = asyncErrorHandler(async (req: Request, res: Response) => {
@@ -111,7 +91,17 @@ export class Sections implements SectionController {
 
         if(!validation.success) return this.validationErr(res, validation.error)
 
-        if(validation.data.content_type === 'image') return this.uploadImage(res, validation.data, req.file)
+        if(validation.data.content_type === 'image') {
+            if(!req.file) return res.status(400).json(createErrorResponse({ 
+                message: 'Validation data error, image file required' 
+            }))
+            
+            if(validation.data.image_name === null) return res.status(400).json(createErrorResponse({ 
+                message: 'Validation data error, image name required' 
+            }))
+
+            this.uploadImage(validation.data.image_name, req.file)
+        }
 
         const newIdSection = await this.sectionModel.addNew(validation.data)
 
