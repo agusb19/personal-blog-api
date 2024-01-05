@@ -1,8 +1,10 @@
+import { s3, bucketName } from '../services/bucket'
+import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { asyncErrorHandler } from '../services/errorHandler'
 import { ArticlesValidation, type IArticlesValidation } from '../validations/Articles'
 import { createOkResponse, createErrorResponse } from '../helpers/appResponse'
+import type { ArticleController, ArticleType } from '../types/articles'
 import type { Request, Response } from 'express'
-import { type ArticleController } from '../types/articles'
 import { type IArticle } from '../types/articles'
 import { type ZodError } from 'zod'
 
@@ -20,6 +22,17 @@ export class Articles implements ArticleController {
             message: 'Validation data error',
             error: validationError.format()
         }))
+    }
+
+    private async uploadImage(imageName: string, imageFile: Express.Multer.File) {
+        const command = new PutObjectCommand({
+            Key: imageName,
+            Bucket: bucketName,
+            Body: imageFile.buffer,
+            ContentType: imageFile.mimetype
+        })
+
+        await s3.send(command)
     }
 
     getAll = asyncErrorHandler(async (req: Request, res: Response) => {
@@ -70,11 +83,15 @@ export class Articles implements ArticleController {
 
         const result = await this.articleModel.getId(validation.data)
         
-        if(result.length !== 0) {
-            return res.status(401).json(createErrorResponse({
-                message: 'Existing article name'
-            }))
-        }
+        if(result.length !== 0) return res.status(401).json(createErrorResponse({
+            message: 'Existing article name'
+        }))
+    
+        if(!req.file) return res.status(400).json(createErrorResponse({ 
+            message: 'Validation data error, image file required' 
+        }))
+
+        await this.uploadImage(validation.data.image_name, req.file)
 
         await this.articleModel.addNew(validation.data)
         
