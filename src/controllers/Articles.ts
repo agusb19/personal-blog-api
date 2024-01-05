@@ -1,6 +1,6 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3, bucketName } from '../services/bucket'
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
+import { GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3"
 import { asyncErrorHandler } from '../services/errorHandler'
 import { ArticlesValidation, type IArticlesValidation } from '../validations/Articles'
 import { createOkResponse, createErrorResponse } from '../helpers/appResponse'
@@ -64,11 +64,7 @@ export class Articles implements ArticleController {
         if(!validation.success) return this.validationErr(res, validation.error)
         
         if(req.file) {
-            const articleData = await this.articleModel.getData({
-                user_id: req.userId.id,
-                name: validation.data.name
-            })
-    
+            const articleData = await this.articleModel.getDataById({ id: validation.data.id })
             await this.uploadImage(articleData[0].image_name, req.file)
         }
 
@@ -121,6 +117,15 @@ export class Articles implements ArticleController {
         const validation = this.validateArticle.id(req.body)
 
         if(!validation.success) return this.validationErr(res, validation.error)
+
+        const articleData = await this.articleModel.getDataById({ id: validation.data.id })
+
+        const command = new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: articleData[0].image_name
+        })
+
+        await s3.send(command)
 
         await this.articleModel.remove(validation.data)
 
