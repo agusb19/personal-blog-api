@@ -24,6 +24,12 @@ export class Users implements UserController {
         this.signWithoutHash = signWithoutHash
         this.validateUser = new UsersValidation()
     }
+
+    private noUserId(res: Response) {
+        return res.status(401).json(createErrorResponse({
+            message: 'User ID missing, please login again'
+        }))
+    }
     
     private validationErr(res: Response, validationError: ZodError<unknown>) {
         return res.status(400).json(createErrorResponse({
@@ -34,11 +40,9 @@ export class Users implements UserController {
 
     getAll = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id } = req.query
-        const validation = this.validateUser.id(req.userId)
+        if(!req.userId.id) return this.noUserId(res)
 
-        if(!validation.success) return this.validationErr(res, validation.error)
-
-        const result = await this.userModel.getAll(validation.data)
+        const result = await this.userModel.getAll(req.userId)
 
         return res.status(200).json(createOkResponse({
             message: 'User data requested',
@@ -87,6 +91,8 @@ export class Users implements UserController {
 
     changeName = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id, name } = req.body
+        if(!req.userId.id) return this.noUserId(res)
+        
         const validation = this.validateUser.idName({...req.body, ...req.userId}) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -108,6 +114,8 @@ export class Users implements UserController {
 
     changeEmail = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id, email } = req.body
+        if(!req.userId.id) return this.noUserId(res)
+
         const validation = this.validateUser.idEmail({...req.body, ...req.userId}) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -129,6 +137,8 @@ export class Users implements UserController {
 
     changeAuthor = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id, author } = req.body
+        if(!req.userId.id) return this.noUserId(res)
+
         const validation = this.validateUser.idAuthor({...req.body, ...req.userId}) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -142,6 +152,8 @@ export class Users implements UserController {
 
     changePassword = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id, password } = req.body
+        if(!req.userId.id) return this.noUserId(res)
+
         const validation = this.validateUser.idPassword({...req.body, ...req.userId}) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -175,18 +187,16 @@ export class Users implements UserController {
 
     remove = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id } = req.body
-        const validation = this.validateUser.id(req.userId)
-
-        if(!validation.success) return this.validationErr(res, validation.error)
+        if(!req.userId.id) return this.noUserId(res)
         
-        await this.userModel.remove(validation.data)
+        await this.userModel.remove(req.userId)
 
         return res.status(200).json(createOkResponse({
             message: 'User removed successfully'
         }))
     })
 
-    cleanUp = asyncErrorHandler(async (req: Request, res: Response) => {
+    cleanUp = asyncErrorHandler(async (_req: Request, res: Response) => {
         await this.userModel.cleanUp()
 
         return res.status(200).json(createOkResponse({

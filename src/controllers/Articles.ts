@@ -18,6 +18,12 @@ export class Articles implements ArticleController {
         this.validateArticle = new ArticlesValidation()
     }    
 
+    private noUserId(res: Response) {
+        return res.status(401).json(createErrorResponse({
+            message: 'User ID missing, please login again'
+        }))
+    }
+
     private validationErr(res: Response, validationError: ZodError<unknown>) {
         return res.status(400).json(createErrorResponse({
             message: 'Validation data error',
@@ -38,11 +44,9 @@ export class Articles implements ArticleController {
 
     getAll = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { id } = req.query
-        const validation = this.validateArticle.userId({user_id: req.userId.id})
-
-        if(!validation.success) return this.validationErr(res, validation.error)
+        if(!req.userId.id) return this.noUserId(res)
         
-        const result = await this.articleModel.getAll(validation.data)
+        const result = await this.articleModel.getAll({ user_id: req.userId.id })
 
         const command = new GetObjectCommand({
             Bucket: bucketName,
@@ -90,6 +94,8 @@ export class Articles implements ArticleController {
 
     addNew = asyncErrorHandler(async (req: Request, res: Response) => {
         // const { user_id, name, title, keywords, image_name, description } = req.body
+        if(!req.userId.id) return this.noUserId(res)
+
         const validation = this.validateArticle.userIdData({...req.body, user_id: req.userId.id})
 
         if(!validation.success) return this.validationErr(res, validation.error)
