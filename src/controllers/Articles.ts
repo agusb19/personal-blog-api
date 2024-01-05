@@ -1,9 +1,10 @@
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3, bucketName } from '../services/bucket'
-import { PutObjectCommand } from "@aws-sdk/client-s3"
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 import { asyncErrorHandler } from '../services/errorHandler'
 import { ArticlesValidation, type IArticlesValidation } from '../validations/Articles'
 import { createOkResponse, createErrorResponse } from '../helpers/appResponse'
-import type { ArticleController, ArticleType } from '../types/articles'
+import type { ArticleController } from '../types/articles'
 import type { Request, Response } from 'express'
 import { type IArticle } from '../types/articles'
 import { type ZodError } from 'zod'
@@ -42,6 +43,13 @@ export class Articles implements ArticleController {
         if(!validation.success) return this.validationErr(res, validation.error)
         
         const result = await this.articleModel.getAll(validation.data)
+
+        const command = new GetObjectCommand({
+            Bucket: bucketName,
+            Key: result[0].image_name
+        })
+
+        result[0].image_name = await getSignedUrl(s3, command, { expiresIn: 43200 })
 
         return res.status(200).json(createOkResponse({
             message: 'Articles from user requested',

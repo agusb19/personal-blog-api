@@ -1,9 +1,10 @@
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3, bucketName } from '../services/bucket'
-import { PutObjectCommand } from "@aws-sdk/client-s3"
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 import { asyncErrorHandler } from "../services/errorHandler"
 import { SectionValidation, type ISectionsValidation } from "../validations/Sections"
 import { createOkResponse, createErrorResponse } from "../helpers/appResponse"
-import type { SectionController, SectionType } from "../types/sections"
+import type { SectionController } from "../types/sections"
 import type { Request, Response } from 'express'
 import { type ISection } from "../types/sections"
 import { type IStyle } from "../types/styles"
@@ -58,6 +59,13 @@ export class Sections implements SectionController {
         }
 
         const result = await this.sectionModel.getAll({ article_id: article_id })
+
+        const command = new GetObjectCommand({
+            Bucket: bucketName,
+            Key: result[0].image_name
+        })
+
+        result[0].image_name = await getSignedUrl(s3, command, { expiresIn: 43200 })
 
         return res.status(200).json(createOkResponse({
             message: 'Sections from article requested',
