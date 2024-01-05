@@ -43,9 +43,9 @@ The API relies on headers, sending the signed token within the response body and
 | Endpoint | Queries | Description | 
 | ------ | ------ | ------ |
 | **GET ***`/article`***** | **token** | Get all articles from user |
-| **PATCH ***`/article/data`***** | id, name, title, keywords, image_name, description **token** | Change article data info |
+| **PATCH ***`/article/data`***** | id, name, title, keywords, image_name, description **token** **imageFile** | Change article data info |
 | **PATCH ***`/article/publishment`***** | id, is_publish, **token** | Change article publish state |
-| **POST ***`/article`***** | name, title, keywords, image_name, description, **token** |  Add new article |
+| **POST ***`/article`***** | name, title, keywords, image_name, description, **token** **imageFile** |  Add new article |
 | **DELETE ***`/article`***** | id, **token** |  Remove article |
 
 ## Section Routes
@@ -53,6 +53,6 @@ The API relies on headers, sending the signed token within the response body and
 | Endpoint | Queries | Description | 
 | ------ | ------ | ------ |
 | **GET ***`/section`***** | article_id, **token** | Get all sections from article |
-| **PUT ***`/section`***** | id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align, text_color, border_radius **token** | Change section |
-| **POST ***`/section`***** | article_id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align, text_color, border_radius **token** | Add new section |
+| **PUT ***`/section`***** | id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align, text_color, border_radius **token** **imageFile** | Change section |
+| **POST ***`/section`***** | article_id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align, text_color, border_radius **token**  **imageFile** | Add new section |
 | **DELETE ***`/section`***** | id, **token** | Remove section |
