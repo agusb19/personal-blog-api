@@ -71,6 +71,20 @@ export class Sections implements SectionController {
 
         if(!validation.success) return this.validationErr(res, validation.error)
 
+        if(validation.data.content_type === 'image') {
+            if(!req.file) return res.status(400).json(createErrorResponse({ 
+                message: 'Validation data error, image file required' 
+            }))
+            
+            if(validation.data.image_name === null) return res.status(400).json(createErrorResponse({ 
+                message: 'Validation data error, image name required' 
+            }))
+
+            const sectionData = await this.sectionModel.getData({ id: validation.data.id })
+
+            await this.uploadImage(sectionData[0].image_name, req.file)
+        }
+
         await this.sectionModel.changeContent(validation.data)
 
         const changeStyleData = {
@@ -100,7 +114,7 @@ export class Sections implements SectionController {
                 message: 'Validation data error, image name required' 
             }))
 
-            this.uploadImage(validation.data.image_name, req.file)
+            await this.uploadImage(validation.data.image_name, req.file)
         }
 
         const newIdSection = await this.sectionModel.addNew(validation.data)
