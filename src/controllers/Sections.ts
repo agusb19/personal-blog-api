@@ -1,6 +1,6 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { s3, bucketName } from '../services/bucket'
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
+import { GetObjectCommand, PutObjectCommand, DeleteObjectCommand  } from "@aws-sdk/client-s3"
 import { asyncErrorHandler } from "../services/errorHandler"
 import { SectionValidation, type ISectionsValidation } from "../validations/Sections"
 import { createOkResponse, createErrorResponse } from "../helpers/appResponse"
@@ -74,33 +74,41 @@ export class Sections implements SectionController {
     })
 
     changeAll = asyncErrorHandler(async (req: Request, res: Response) => {
-        // const { id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
+        // const { id, content, content_type, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
         const validation = this.validateSection.idData(req.body) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
 
-        if(validation.data.content_type === 'image') {
+        const sectionData = await this.sectionModel.getData({ id: validation.data.id })
+
+        const isImageType = validation.data.content_type === 'image'
+        const imageName = sectionData[0].image_name
+
+        if(isImageType) {
             if(!req.file) return res.status(400).json(createErrorResponse({ 
                 message: 'Validation data error, image file required' 
             }))
-            
-            if(validation.data.image_name === null) return res.status(400).json(createErrorResponse({ 
-                message: 'Validation data error, image name required' 
-            }))
-
-            const sectionData = await this.sectionModel.getData({ id: validation.data.id })
 
             await this.uploadImage(sectionData[0].image_name, req.file)
+
+        } else if(imageName !== null) {
+            const command = new DeleteObjectCommand({
+                Bucket: bucketName,
+                Key: imageName
+            })
+    
+            await s3.send(command)
         }
 
-        await this.sectionModel.changeContent(validation.data)
+        await this.sectionModel.changeContent({
+            ...validation.data,
+            image_name: isImageType ? imageName : null
+        })
 
-        const changeStyleData = {
+        await this.styleModel.changeStyles({
             ...validation.data,
             section_id: validation.data.id
-        }
-
-        await this.styleModel.changeStyles(changeStyleData)
+        })
 
         return res.status(200).json(createOkResponse({
             message: 'Section content and styles changed successfully'
