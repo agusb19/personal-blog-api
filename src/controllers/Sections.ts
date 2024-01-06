@@ -60,12 +60,14 @@ export class Sections implements SectionController {
 
         const result = await this.sectionModel.getAll({ article_id: article_id })
 
-        const command = new GetObjectCommand({
-            Bucket: bucketName,
-            Key: result[0].image_name
-        })
-
-        result[0].image_name = await getSignedUrl(s3, command, { expiresIn: 43200 })
+        if(result[0].image_name) {
+            const command = new GetObjectCommand({
+                Bucket: bucketName,
+                Key: result[0].image_name
+            })
+    
+            result[0].image_name = await getSignedUrl(s3, command, { expiresIn: 43200 })
+        }
 
         return res.status(200).json(createOkResponse({
             message: 'Sections from article requested',
