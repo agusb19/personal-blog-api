@@ -1,11 +1,13 @@
+import path from 'path'
 import request from 'supertest'
 import { app } from '../server'
 import { userMock, artileMock, sectionMock } from './mockData'
 
-let userId: number
 let articleId: number
 let sectionId: number 
 let token: string
+
+const imagePath = path.resolve(__dirname, '../../public/Image Test.png')
 
 export default (RESOURCE: string) => {
     const USER_RESOURCE = RESOURCE.replace('/section', '/user')  
@@ -35,14 +37,6 @@ export default (RESOURCE: string) => {
                 .send(userMock.rightData)
                 .expect(200)
             token = response.body.result.token
-        })  
-        
-        test('should GET ID from users account', async () => {
-            const response = await request(app)
-                .get(`${USER_RESOURCE}/data`)
-                .set('Authorization', `Bearer ${token}`)
-                .expect(200)
-            userId = response.body.result.data[0].id
         })  
 
         test('should GET ARTICLE-ID from new article user', async () => {
@@ -90,6 +84,7 @@ export default (RESOURCE: string) => {
                 .put(RESOURCE)
                 .set('Authorization', `Bearer ${token}`)
                 .send(sectionMock.changeStyles(sectionId))
+                .attach('image', imagePath, { filename: 'Image Test.png', contentType: 'image/png' })
                 .expect(200)
         })
 
@@ -100,8 +95,12 @@ export default (RESOURCE: string) => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
 
-            expect(response.body.result.data[0])
-               .toMatchObject(sectionMock.changeStyles(sectionId))
+            expect(response.body.result.data[0]).toEqual(
+                expect.objectContaining({
+                    ...sectionMock.changeStyles(sectionId),
+                    image_name: expect.anything()
+                })
+            )  
         })
     })
 

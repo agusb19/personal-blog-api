@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto"
 import { type UserType } from "../types/users"
 import { type ArticleType } from "../types/articles"
 import { type SectionType } from "../types/sections"
@@ -16,7 +17,7 @@ type UserMock = {
 
 type ArticleMock = {
     newData: (articleId: number) => ArticleType['idData']
-    newArticle: Omit<ArticleType['idData'], "id">
+    newArticle: Omit<ArticleType['userIdData'], "user_id">
     newPublishState: (articleId: number) => ArticleType['idPublishState']
 }
 
@@ -24,6 +25,8 @@ type SectionMock = {
     newSectionStyles: (articleId: number) => SectionType['articleIdData']
     changeStyles: (sectionId: number) => SectionType['idData']
 }
+
+const randomHash = randomBytes(16).toString('hex')
 
 export const userMock: UserMock = {
     signUp: { 
@@ -73,7 +76,7 @@ export const userMock: UserMock = {
 export const artileMock: ArticleMock = {
     newArticle: {
         name: 'My Article Test',
-        image: 'https://th.bing.com/th/id/OIP.jaWRCdx3lBfjZuK_dJ_jiwHaEK?rs=1&pid=ImgDetMain',
+        image_name: 'Jack Smith - My Article Test - Main Image',
         title: 'My Title',
         keywords: 'My Keywords',
         description: 'My Description'
@@ -81,7 +84,6 @@ export const artileMock: ArticleMock = {
     newData: (articleId) => ({
             id: articleId,
             name: 'New Article Name',
-            image: 'https://th.bing.com/th/id/OIP.WQuVYA_rOsaqBTIK0TgsXwAAAA?w=280&h=235&rs=1&pid=ImgDetMain',
             title: 'New Article Title',
             keywords: 'New Article Keywords',
             description: 'New Article Description'
@@ -100,7 +102,7 @@ export const sectionMock: SectionMock = {
            article_id: articleId,
            content: 'New Article Section',
            content_type: 'paragraph',
-           image_url: null,
+           image_name: null,
            width: '90%',
            height: 'auto',
            font_family: 'Verdana',
@@ -118,7 +120,7 @@ export const sectionMock: SectionMock = {
            id: sectionId,
            content: 'Image alt text',
            content_type: 'image',
-           image_url: 'https://th.bing.com/th/id/OIP.QI29d315w9fABt0BQCsIwwHaE8?rs=1&pid=ImgDetMain',
+           image_name: `Jack Smith - My Article Test - Image ${randomHash}`,
            width: '80%',
            height: '95%',
            font_family: 'Monospace',

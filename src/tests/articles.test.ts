@@ -1,10 +1,12 @@
+import path from 'path'
 import request from 'supertest'
 import { app} from '../server'
 import { userMock, artileMock } from './mockData'
 
-let userId: number
 let articleId: number
 let token: string
+
+const imagePath = path.resolve(__dirname, '../../public/Image Test.png')
 
 export default (RESOURCE: string) => {
     const USER_RESOURCE = RESOURCE.replace('/article', '/user')
@@ -34,14 +36,6 @@ export default (RESOURCE: string) => {
                 .expect(200)
             token = response.body.result.token
         })  
-        
-        test('should GET USER-ID from users account', async () => {
-            const response = await request(app)
-                .get(`${USER_RESOURCE}/data`)
-                .set('Authorization', `Bearer ${token}`)
-                .expect(200)
-            userId = response.body.result.data[0].id
-        })  
     })
 
     describe('Test create and read new article post', () => {
@@ -51,6 +45,7 @@ export default (RESOURCE: string) => {
                 .post(RESOURCE)
                 .set('Authorization', `Bearer ${token}`)
                 .send(artileMock.newArticle)
+                .attach('image', imagePath, { filename: 'Image Test.png', contentType: 'image/png' })
                 .expect(201)
         })
         
@@ -61,8 +56,12 @@ export default (RESOURCE: string) => {
                 .expect(200)
             articleId = response.body.result.data[0].id
                 
-            expect(response.body.result.data[0])
-               .toMatchObject(artileMock.newArticle)
+            expect(response.body.result.data[0]).toEqual(
+                expect.objectContaining({
+                  ...artileMock.newArticle,
+                  image_name: expect.anything()
+                })
+            )  
         })
     })
 
@@ -90,12 +89,14 @@ export default (RESOURCE: string) => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 
-            expect(response.body.result.data[0])
-               .toMatchObject({
+            expect(response.body.result.data[0]).toEqual(
+                expect.objectContaining({
                     ...artileMock.newData(articleId),
+                    image_name: expect.anything(),
                     id: articleId,
                     is_publish: 1
                 })
+            )  
         })
     })
 
