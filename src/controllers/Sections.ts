@@ -74,7 +74,7 @@ export class Sections implements SectionController {
     })
 
     changeAll = asyncErrorHandler(async (req: Request, res: Response) => {
-        // const { id, content, content_type, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
+        // const { id, content, content_type, image_name, width, height, font_size, font_weight, font_family, line_height, margin_top, text_align`, text_color, border_radius } = req.body
         const validation = this.validateSection.idData(req.body) 
 
         if(!validation.success) return this.validationErr(res, validation.error)
@@ -82,19 +82,27 @@ export class Sections implements SectionController {
         const sectionData = await this.sectionModel.getData({ id: validation.data.id })
 
         const isImageType = validation.data.content_type === 'image'
-        const imageName = sectionData[0].image_name
+        const imageDBName = sectionData[0].image_name
 
         if(isImageType) {
             if(!req.file) return res.status(400).json(createErrorResponse({ 
                 message: 'Validation data error, image file required' 
-            }))
+            }))            
 
-            await this.uploadImage(sectionData[0].image_name, req.file)
+            if(!imageDBName) {
+                if(!validation.data.image_name) return res.status(400).json(createErrorResponse({ 
+                    message: 'Validation data error, image name required' 
+                }))
 
-        } else if(imageName !== null) {
+                await this.uploadImage(validation.data.image_name, req.file)
+            } else {
+                await this.uploadImage(imageDBName, req.file)
+            }
+                
+        } else if(imageDBName !== null) {
             const command = new DeleteObjectCommand({
                 Bucket: bucketName,
-                Key: imageName
+                Key: imageDBName
             })
     
             await s3.send(command)
@@ -102,7 +110,7 @@ export class Sections implements SectionController {
 
         await this.sectionModel.changeContent({
             ...validation.data,
-            image_name: isImageType ? imageName : null
+            image_name: isImageType ? imageDBName : null
         })
 
         await this.styleModel.changeStyles({
